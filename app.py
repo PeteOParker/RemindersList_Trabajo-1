@@ -11,7 +11,7 @@ idActual = 1
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return render_template("index.html", reminders=reminders)
 
 @app.route("/api/reminders", methods=["GET"])
 def api_reminders():
@@ -22,16 +22,15 @@ def api_reminders():
 def api_add_reminder():
     # Variables
     global idActual
-    datos = request.get_json()
     createdAt = datetime.now().timestamp()
 
     # Validaciones de campos vacios
     try:
-        texto = datos.get("content")
+        texto = request.form["content"]
     except ValueError:
         return "El parametro content es obligatorio", 400
     try:
-        importante = datos.get("important")
+        importante = request.form.get("important")
     except ValueError:
         importante = None
     if len(texto) > 120:
@@ -54,4 +53,5 @@ def api_add_reminder():
     reminders.append(new_reminder)
     idActual += 1
 
-    return new_reminder, 201
+    return redirect("/")
+
