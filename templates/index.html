@@ -14,12 +14,10 @@
                                 <h5 class="card-title">ID: {{ reminder.id }}</h5>
                                 <p class="card-text"><strong>Contenido:</strong> {{ reminder.content }}</p>
                                 <p class="card-text"><strong>Fecha de Creación:</strong> {{ reminder.createdAt }}</p>
-                                <p class="card-text"><strong>Importante:</strong> {{ reminder.important }}</p>
-            
+                                <p class="card-text"><strong>Importante:</strong> {{ "Sí" if reminder.important else "No" }}</p>
                                 <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editModal{{ reminder.id }}">
                                     Editar
                                 </button>
-                
                                 <form action="/api/reminders/{{ reminder.id }}" method="POST" class="d-inline">
                                     <input type="hidden" name="_method" value="DELETE">
                                     <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>

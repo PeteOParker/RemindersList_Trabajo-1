@@ -9,6 +9,13 @@ app.secret_key = 'd94231c751543589c4619656fb1781f28bc9452632e5977ef76660c352bc5d
 reminders = []
 idActual = 1
 
+@app.before_request
+def method_override():
+    if request.method == "POST" and "_method" in request.form:
+        method = request.form["_method"].upper()
+        if method in ["PUT", "PATCH", "DELETE"]:
+            request.environ["REQUEST_METHOD"] = method
+
 @app.route("/")
 def index():
     return render_template("index.html", reminders=reminders)
@@ -55,3 +62,13 @@ def api_add_reminder():
 
     return redirect("/")
 
+# END POINT: Eliminar Recordatorio
+@app.route("/api/reminders/<int:id>", methods=["POST", "DELETE"])
+def api_borrar_reminder(id):
+    for index, reminder in enumerate(reminders):
+        if reminder["id"] == id:
+            del reminders[index]
+            flash("Recordatorio eliminado exitosamente.", "success")
+            return redirect("/")
+    flash("Recordatorio no encontrado.", "danger")
+    return redirect("/")
