@@ -1,5 +1,6 @@
 from flask import Flask, request, render_template, redirect, flash
 from datetime import datetime
+import uuid
 
 app = Flask(__name__)
 app.secret_key = 'd94231c751543589c4619656fb1781f28bc9452632e5977ef76660c352bc5da7'
@@ -18,7 +19,6 @@ def api_reminders():
 # END POINT: Agregar Recordatorio
 @app.route("/api/reminders", methods=["POST"])
 def api_add_reminder():
-    global idActual
     createdAt = datetime.now().timestamp()
 
     try:
@@ -43,14 +43,19 @@ def api_add_reminder():
     else:
         return "El valor de important debe ser True o False", 400
 
-    new_reminder = { "id": idActual, "content": texto, "important": importante, "createdAt": createdAt }
+    new_reminder = {
+        "id": str(uuid.uuid4()),
+        "content": texto,
+        "important": importante,
+        "createdAt": createdAt
+    }
     reminders.append(new_reminder)
-    idActual += 1
     reminders.sort(key=lambda x: not x["important"])
+    flash("Recordatorio agregado exitosamente.", "success")
     return redirect("/")
 
 # END POINT: Actualizar Recordatorio
-@app.route("/api/reminders/<int:id>", methods=["POST", "PATCH"])
+@app.route("/api/reminders/<string:id>", methods=["POST", "PATCH"])
 def actualizar_reminder(id):
     content = request.form.get("content", "").strip()
     important = request.form.get("important", "false").lower()
@@ -78,7 +83,7 @@ def actualizar_reminder(id):
     return redirect("/")
 
 # END POINT: Borrar Recordatorio
-@app.route("/api/reminder/<int:id>", methods=["POST", "DELETE"])
+@app.route("/api/reminder/<string:id>", methods=["POST", "DELETE"])
 def borrar_reminder(id):
     for index, reminder in enumerate(reminders):
         if reminder["id"] == id:
@@ -89,7 +94,7 @@ def borrar_reminder(id):
     return redirect("/")
 
 # END POINT: Borrar Recordatorio (API)
-@app.route("/api/reminders/<int:id>", methods=["DELETE"])
+@app.route("/api/reminders/<string:id>", methods=["DELETE"])
 def api_borrar_reminder(id):
     for index, reminder in enumerate(reminders):
         if reminder["id"] == id:

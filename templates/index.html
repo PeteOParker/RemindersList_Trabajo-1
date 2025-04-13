@@ -2,25 +2,46 @@
 
 {% block contenido %}
 <div class="container py-5">
-        <h1 class="text-center mb-4">Lista de Recordatorios</h1>
+
+    <form action="/api/reminders" method="POST" class="p-4 border rounded bg-white">
+        <div class="mb-3">
+            <label for="content" class="form-label">Contenido</label>
+            <input id="content" name="content" class="form-control" rows="4" required maxlength="120"></input>
+        </div>
+        <div class="form-check mb-3">
+            <input type="checkbox" id="important" name="important" value="true" class="form-check-input">
+            <label for="important" class="form-check-label">Recordatorio Importante</label>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Agregar Recordatorio</button>
+    </form>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="container">
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+        <h1 class="text-center mb-4">Recordatorios</h1>
 
         <div id="reminders" class="mb-5">
             {% if reminders %}
                 <div class="row">
                     {% for reminder in reminders %}
-                    <div class="col-md-4">
-                        <div class="card mb-3 {% if reminder.important %}border-warning{% else %}border-secondary{% endif %}">
+                    <div class="col-md-2">
+                        <div>
                             <div class="card-body">
-                                <h5 class="card-title">ID: {{ reminder.id }}</h5>
                                 <p class="card-text"><strong>Contenido:</strong> {{ reminder.content }}</p>
                                 <p class="card-text"><strong>Fecha de Creación:</strong> {{ reminder.createdAt }}</p>
                                 <p class="card-text"><strong>Importante:</strong> {{ "Sí" if reminder.important else "No" }}</p>
                                 <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editModal{{ reminder.id }}">
-                                    Editar
+                                    Editar Recordatorio
                                 </button>
                                 <form action="/api/reminder/{{ reminder.id }}" method="POST" class="d-inline">
-                                    <input type="hidden" name="_method" value="DELETE">
-                                    <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+                                    <button type="submit" class="btn btn-sm btn-danger">Eliminar Recordatorio</button>
                                 </form>
                             </div>
                         </div>
@@ -29,7 +50,6 @@
                         <div class="modal-dialog">
                             <div class="modal-content">
                                 <form action="/api/reminders/{{ reminder.id }}" method="POST">
-                                    <input type="hidden" name="_method" value="PATCH">
                                     <div class="modal-body">
                                         <div class="mb-3">
                                             <label for="content{{ reminder.id }}" class="form-label">Contenido</label>
@@ -51,34 +71,12 @@
                     {% endfor %}
                 </div>
             {% else %}
-                <p class="text-center text-muted">No hay recordatorios disponibles.</p>
+                <p class="text-center text-muted">No hay recordatorios.</p>
             {% endif %}
         </div>
-
-         <h2 class="text-center mb-4">Agregar Nuevo Recordatorio</h2>
-         {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        <div class="container">
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endfor %}
-        </div>
-    {% endif %}
+         
 {% endwith %}
 
-        <form action="/api/reminders" method="POST" class="p-4 border rounded bg-white">
-            <div class="mb-3">
-                <label for="content" class="form-label">Contenido</label>
-                <textarea id="content" name="content" class="form-control" rows="4" required maxlength="120"></textarea>
-            </div>
-            <div class="form-check mb-3">
-                <input type="checkbox" id="important" name="important" value="true" class="form-check-input">
-                <label for="important" class="form-check-label">¿Es importante?</label>
-            </div>
-            <button type="submit" class="btn btn-primary w-100">Agregar Recordatorio</button>
-        </form>
+        
     </div>
 {% endblock %}
